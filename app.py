@@ -1,4 +1,3 @@
-Set-Content -Path app.py -Value @'
 import streamlit as st
 import pandas as pd
 import folium
@@ -211,4 +210,3 @@ st.dataframe(
     ],
     use_container_width=True
 )
-'@
