@@ -202,7 +202,10 @@ def fetch_news():
         if not response.text.strip():
             return pd.DataFrame(columns=["Headline", "Source Country", "URL"])
 
-        news_data = response.json()
+        try:
+            news_data = response.json()
+        except:
+            return pd.DataFrame(columns=["Headline", "Source Country", "URL"])
 
         rows = []
 
