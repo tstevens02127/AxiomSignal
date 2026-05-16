@@ -22,6 +22,17 @@ st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 st.success("System operational.")
 
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Live Risk Events", 3)
+
+with col2:
+    st.metric("Highest Risk Score", 8)
+
+with col3:
+    st.metric("Operational Status", "Elevated")
+
 data = pd.DataFrame({
     "Type": ["Earthquake", "Port Disruption", "Severe Weather"],
     "Location": ["Chile", "Panama Canal", "Brazil"],
