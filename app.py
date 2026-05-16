@@ -13,34 +13,54 @@ st.set_page_config(
 )
 
 st.title("📡 AxiomSignal")
-st.caption("Predictive Operational Intelligence for Latin American Logistics & Infrastructure")
-st.subheader("Real-Time Risk Monitoring Across Critical Supply Chain Corridors")
+
+st.caption(
+    "Predictive Operational Intelligence for Latin American Logistics & Infrastructure"
+)
+
+st.subheader(
+    "Real-Time Risk Monitoring Across Critical Supply Chain Corridors"
+)
+
 st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 st.success("System operational.")
 
+
 def earthquake_risk_score(magnitude):
+
     if magnitude >= 7:
         return 10
+
     elif magnitude >= 6:
         return 8
+
     elif magnitude >= 5:
         return 6
+
     elif magnitude >= 4:
         return 4
+
     return 2
+
 
 @st.cache_data(ttl=300)
 def fetch_earthquakes():
+
     url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson"
+
     response = requests.get(url, timeout=10)
+
     response.raise_for_status()
-    data = response.json()
+
+    quake_data = response.json()
 
     rows = []
 
-    for feature in data.get("features", []):
+    for feature in quake_data.get("features", []):
+
         props = feature.get("properties", {})
+
         coords = feature.get("geometry", {}).get("coordinates", [])
 
         if len(coords) < 2:
@@ -48,6 +68,7 @@ def fetch_earthquakes():
 
         lon = coords[0]
         lat = coords[1]
+
         mag = props.get("mag", 0) or 0
 
         if not (-60 <= lat <= 35 and -150 <= lon <= -30):
@@ -59,11 +80,11 @@ def fetch_earthquakes():
             "Magnitude": mag,
             "Risk Score": earthquake_risk_score(mag),
             "Latitude": lat,
-            "Longitude": lon,
-            "URL": props.get("url", "")
+            "Longitude": lon
         })
 
     return pd.DataFrame(rows)
+
 
 data = fetch_earthquakes()
 
@@ -84,16 +105,25 @@ with col1:
     st.metric("Live Earthquake Events", len(filtered_data))
 
 with col2:
-    highest_score = int(filtered_data["Risk Score"].max()) if not filtered_data.empty else 0
+
+    highest_score = (
+        int(filtered_data["Risk Score"].max())
+        if not filtered_data.empty
+        else 0
+    )
+
     st.metric("Highest Risk Score", highest_score)
 
 with col3:
+
     status = "Elevated" if highest_score >= 6 else "Normal"
+
     st.metric("Operational Status", status)
 
 st.divider()
 
 st.subheader("Live Seismic Risk Feed")
+
 st.dataframe(filtered_data, use_container_width=True)
 
 st.subheader("Operational Risk Map")
@@ -105,10 +135,13 @@ risk_map = folium.Map(
 )
 
 for _, row in filtered_data.iterrows():
+
     if row["Risk Score"] >= 8:
         color = "red"
+
     elif row["Risk Score"] >= 5:
         color = "orange"
+
     else:
         color = "green"
 
