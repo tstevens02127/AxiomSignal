@@ -218,10 +218,17 @@ def fetch_news():
 
         return pd.DataFrame(rows)
 
-    except Exception as e:
+    except requests.exceptions.HTTPError as e:
+        if response.status_code == 429:
+            return pd.DataFrame(columns=["Headline", "Source Country", "URL"])
+
         st.error(f"News feed error: {e}")
         return pd.DataFrame(columns=["Headline", "Source Country", "URL"])
 
+    except Exception as e:
+        st.error(f"News feed error: {e}")
+        return pd.DataFrame(columns=["Headline", "Source Country", "URL"])
+        
 st.divider()
 
 def risk_alert(score, message):
