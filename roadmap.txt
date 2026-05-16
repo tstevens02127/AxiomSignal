@@ -1,0 +1,9 @@
+5/14/26 tasks:
+deployment
+GDELT improvement
+UI polish
+AI summaries
+user workflow
+MVP demo video
+Chile-focused signals
+operational scenarios
