@@ -235,12 +235,12 @@ if news_df.empty:
     st.warning("No live news intelligence signals detected.")
 else:
     for _, row in news_df.iterrows():
-    st.markdown(
-        f"""
-        ### [{row['Headline']}]({row['URL']})
+        st.markdown(
+            f"""
+            ### [{row['Headline']}]({row['URL']})
 
-        Source Country: {row['Source Country']}
-        """
+            Source Country: {row['Source Country']}
+            """
     )
 
     st.divider()
