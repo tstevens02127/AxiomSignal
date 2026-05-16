@@ -199,6 +199,9 @@ def fetch_news():
     try:
         response = requests.get(url, params=params, timeout=15)
         response.raise_for_status()
+        if not response.text.strip():
+            return pd.DataFrame(columns=["Headline", "Source Country", "URL"])
+
         news_data = response.json()
 
         rows = []
