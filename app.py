@@ -184,6 +184,19 @@ else:
 
 st.info(summary)
 
+top_event = filtered_data.sort_values(
+    by="Risk Score",
+    ascending=False
+).iloc[0]
+
+st.warning(
+    f"""
+    Top Active Threat:
+    {top_event['Type']} detected near {top_event['Location']}
+    with risk score {top_event['Risk Score']}.
+    """
+)
+
 st.divider()
 
 st.subheader("Live Operational Risk Feed")
