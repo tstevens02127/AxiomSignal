@@ -221,7 +221,7 @@ else:
     No immediate intervention required. Continue routine monitoring.
     """
 
-st.success(action)
+risk_alert(top_event["Risk Score"], action)
 
 st.divider()
 
