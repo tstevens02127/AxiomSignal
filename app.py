@@ -11,7 +11,6 @@ from streamlit_folium import st_folium
 # -----------------------------
 
 st.set_page_config(
-st.set_page_config(
     page_title="AxiomSignal",
     page_icon="📡",
     layout="wide"
