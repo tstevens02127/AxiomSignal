@@ -189,7 +189,7 @@ def fetch_news():
     url = "https://api.gdeltproject.org/api/v2/doc/doc"
 
     params = {
-        "query": 'earthquake OR port OR shipping OR logistics OR supply chain OR weather OR infrastructure OR Chile OR Peru OR Brazil OR Colombia',
+        "query": 'logistics OR shipping OR port OR earthquake OR infrastructure',
         "mode": "ArtList",
         "format": "json",
         "maxrecords": 10,
