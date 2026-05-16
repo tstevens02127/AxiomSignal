@@ -234,7 +234,16 @@ news_df = fetch_news()
 if news_df.empty:
     st.warning("No live news intelligence signals detected.")
 else:
-    st.dataframe(news_df, use_container_width=True)
+    for _, row in news_df.iterrows():
+    st.markdown(
+        f"""
+        ### [{row['Headline']}]({row['URL']})
+
+        Source Country: {row['Source Country']}
+        """
+    )
+
+    st.divider()
 
 st.subheader("News-Based Operational Intelligence")
 
