@@ -5,8 +5,31 @@ import requests
 
 from datetime import datetime
 from streamlit_folium import st_folium
+from streamlit_autorefresh import st_autorefresh
 
 st.set_page_config(page_title="AxiomSignal", page_icon="📡", layout="wide")
+
+st_autorefresh(interval=300000, key="axiomsignal_refresh")
+
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: #0b1020;
+        color: #e5e7eb;
+    }
+
+    h1, h2, h3 {
+        color: #f8fafc;
+    }
+
+    [data-testid="stMetricValue"] {
+        color: #38bdf8;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 st.title("📡 AxiomSignal")
 st.caption("Predictive Operational Intelligence for Latin American Logistics & Infrastructure")
@@ -161,6 +184,37 @@ with col3:
     status = "Elevated" if highest_score >= 6 else "Normal"
     st.metric("Operational Status", status)
 
+@st.cache_data(ttl=900)
+def fetch_news():
+    url = "https://api.gdeltproject.org/api/v2/doc/doc"
+
+    params = {
+        "query": 'Chile OR Peru OR Colombia OR Brazil logistics OR port OR shipping OR supply chain',
+        "mode": "ArtList",
+        "format": "json",
+        "maxrecords": 10,
+        "sort": "HybridRel",
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=15)
+        response.raise_for_status()
+        news_data = response.json()
+
+        rows = []
+
+        for article in news_data.get("articles", []):
+            rows.append({
+                "Headline": article.get("title", ""),
+                "Source Country": article.get("sourceCountry", ""),
+                "URL": article.get("url", "")
+            })
+
+        return pd.DataFrame(rows)
+
+    except Exception:
+        return pd.DataFrame(columns=["Headline", "Source Country", "URL"])
+
 st.divider()
 
 def risk_alert(score, message):
@@ -172,6 +226,15 @@ def risk_alert(score, message):
         st.info(message)
     else:
         st.success(message)
+
+st.subheader("Live News Intelligence Feed")
+
+news_df = fetch_news()
+
+if news_df.empty:
+    st.warning("No live news intelligence signals detected.")
+else:
+    st.dataframe(news_df, use_container_width=True)
 
 st.subheader("AI Operational Intelligence Summary")
 
