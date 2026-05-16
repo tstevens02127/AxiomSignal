@@ -6,51 +6,64 @@ import folium
 from datetime import datetime
 from streamlit_folium import st_folium
 
-col1, col2, col3 = st.columns([1,2,1])
-
-with col2:
-    st.image(
-        "assets/AxiomSignal transparent.png",
-        width=450
-    )
-
-st.set_page_config(page_title="AxiomSignal", layout="wide")
-
-st.caption(
-    "Predictive Operational Intelligence for Latin American Logistics & Infrastructure"
+# -----------------------------
+# PAGE CONFIG
+# -----------------------------
+st.set_page_config(
+    page_title="AxiomSignal",
+    page_icon="📡",
+    layout="wide"
 )
 
-st.subheader(
-    "Real-Time Risk Monitoring Across Critical Supply Chain Corridors"
+# -----------------------------
+# HEADER
+# -----------------------------
+st.markdown(
+    """
+    <div style="padding: 14px 0 6px 0;">
+        <h1 style="margin-bottom: 0;">📡 AxiomSignal</h1>
+        <p style="font-size: 18px; color: #6b7280; margin-top: 4px;">
+            Predictive Operational Intelligence for Latin American Logistics & Infrastructure
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
-st.caption(
-    f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-)
+st.subheader("Real-Time Risk Monitoring Across Critical Supply Chain Corridors")
+
+st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 st.info(
     """
-    AxiomSignal provides real-time operational risk intelligence
-    for Latin American logistics and infrastructure operators.
+    AxiomSignal helps mid-size logistics and infrastructure operators identify elevated
+    operational risks before disruptions escalate.
     """
 )
 
 st.markdown(
     """
-    ### Monitored Risk Categories
-
-    - Seismic Activity
-    - Severe Weather
-    - Infrastructure Disruption
-    - Geopolitical Events
-    - Supply Chain Volatility
+    **Monitored Risk Categories:** Seismic Activity · Severe Weather · Infrastructure Disruption · Geopolitical Events · Supply Chain Volatility
     """
 )
 
+# -----------------------------
+# SIDEBAR
+# -----------------------------
 st.sidebar.header("Filters")
 
-min_risk = st.sidebar.slider("Minimum Risk Score", 1, 10, 5)
+min_risk = st.sidebar.slider(
+    "Minimum Risk Score",
+    min_value=1,
+    max_value=10,
+    value=5
+)
 
+selected_categories = st.sidebar.multiselect(
+    "Risk Categories",
+    ["Earthquake", "Weather", "News / Geopolitical"],
+    default=["Earthquake", "Weather", "News / Geopolitical"]
+)
 
 # -----------------------------
 # RISK SCORING
@@ -62,8 +75,7 @@ def risk_label(score):
         return "Elevated"
     elif score >= 3:
         return "Moderate"
-    else:
-        return "Low"
+    return "Low"
 
 
 def earthquake_risk_score(magnitude):
@@ -75,8 +87,7 @@ def earthquake_risk_score(magnitude):
         return 6
     elif magnitude >= 4:
         return 4
-    else:
-        return 2
+    return 2
 
 
 def weather_risk_score(wind_speed, precipitation):
@@ -111,6 +122,9 @@ def news_risk_score(title):
         "violence",
         "emergency",
         "disruption",
+        "logistics",
+        "transport",
+        "infrastructure",
     ]
 
     score = 3
@@ -124,25 +138,20 @@ def news_risk_score(title):
 
 def color_severity(val):
     if val == "Critical":
-        return "background-color: #ff4b4b; color: white"
+        return "background-color: #dc2626; color: white"
     elif val == "Elevated":
-        return "background-color: #ffa500; color: black"
+        return "background-color: #f59e0b; color: black"
     elif val == "Moderate":
-        return "background-color: #ffe066; color: black"
-    else:
-        return "background-color: #4caf50; color: white"
+        return "background-color: #fde68a; color: black"
+    return "background-color: #16a34a; color: white"
 
 
 # -----------------------------
-# EARTHQUAKE DATA
+# DATA SOURCES
 # -----------------------------
 @st.cache_data(ttl=300)
 def fetch_earthquakes():
-    url = (
-        "https://earthquake.usgs.gov/"
-        "earthquakes/feed/v1.0/"
-        "summary/4.5_week.geojson"
-    )
+    url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson"
 
     response = requests.get(url, timeout=10)
     response.raise_for_status()
@@ -150,15 +159,22 @@ def fetch_earthquakes():
     data = response.json()
     rows = []
 
-    for feature in data["features"]:
-        props = feature["properties"]
-        coords = feature["geometry"]["coordinates"]
+    for feature in data.get("features", []):
+        props = feature.get("properties", {})
+        geometry = feature.get("geometry", {})
+        coords = geometry.get("coordinates", [None, None])
 
-        magnitude = props.get("mag", 0)
-        latitude = coords[1]
+        if len(coords) < 2:
+            continue
+
+        magnitude = props.get("mag", 0) or 0
         longitude = coords[0]
+        latitude = coords[1]
 
-        # Focus on LatAm + Pacific logistics corridor
+        if latitude is None or longitude is None:
+            continue
+
+        # LatAm + Pacific logistics corridor focus
         if not (-60 <= latitude <= 35 and -150 <= longitude <= -30):
             continue
 
@@ -167,21 +183,20 @@ def fetch_earthquakes():
         rows.append(
             {
                 "Type": "Earthquake",
-                "Location": props.get("place", ""),
+                "Location": props.get("place", "Unknown location"),
                 "Risk Score": score,
                 "Severity": risk_label(score),
                 "Magnitude": magnitude,
                 "Latitude": latitude,
                 "Longitude": longitude,
+                "Headline": "",
+                "URL": props.get("url", ""),
             }
         )
 
     return pd.DataFrame(rows)
 
 
-# -----------------------------
-# WEATHER DATA
-# -----------------------------
 @st.cache_data(ttl=1800)
 def fetch_weather():
     locations = [
@@ -189,47 +204,50 @@ def fetch_weather():
         {"name": "Valparaiso", "lat": -33.04, "lon": -71.63},
         {"name": "Lima", "lat": -12.05, "lon": -77.04},
         {"name": "Santos Port", "lat": -23.96, "lon": -46.33},
+        {"name": "Buenaventura", "lat": 3.88, "lon": -77.03},
+        {"name": "Cartagena", "lat": 10.39, "lon": -75.48},
     ]
 
     rows = []
 
     for loc in locations:
         url = (
-            f"https://api.open-meteo.com/v1/forecast?"
-            f"latitude={loc['lat']}&longitude={loc['lon']}"
-            f"&current=temperature_2m,precipitation,wind_speed_10m"
+            "https://api.open-meteo.com/v1/forecast"
+            f"?latitude={loc['lat']}&longitude={loc['lon']}"
+            "&current=temperature_2m,precipitation,wind_speed_10m"
         )
 
         response = requests.get(url, timeout=10)
         response.raise_for_status()
 
         data = response.json()
-        current = data["current"]
+        current = data.get("current", {})
 
-        wind_speed = current.get("wind_speed_10m", 0)
-        precipitation = current.get("precipitation", 0)
+        wind_speed = current.get("wind_speed_10m", 0) or 0
+        precipitation = current.get("precipitation", 0) or 0
+        temperature = current.get("temperature_2m", 0) or 0
+
         score = weather_risk_score(wind_speed, precipitation)
 
         rows.append(
             {
                 "Type": "Weather",
                 "Location": loc["name"],
-                "Temperature": current.get("temperature_2m", 0),
-                "Wind Speed": wind_speed,
-                "Precipitation": precipitation,
                 "Risk Score": score,
                 "Severity": risk_label(score),
+                "Temperature": temperature,
+                "Wind Speed": wind_speed,
+                "Precipitation": precipitation,
                 "Latitude": loc["lat"],
                 "Longitude": loc["lon"],
+                "Headline": "",
+                "URL": "",
             }
         )
 
     return pd.DataFrame(rows)
 
 
-# -----------------------------
-# GDELT NEWS / DISRUPTION DATA
-# -----------------------------
 @st.cache_data(ttl=900)
 def fetch_gdelt_news():
     url = "https://api.gdeltproject.org/api/v2/doc/doc"
@@ -243,14 +261,7 @@ def fetch_gdelt_news():
     }
 
     empty_df = pd.DataFrame(
-        columns=[
-            "Type",
-            "Location",
-            "Headline",
-            "Risk Score",
-            "Severity",
-            "URL",
-        ]
+        columns=["Type", "Location", "Risk Score", "Severity", "Headline", "URL"]
     )
 
     try:
@@ -261,23 +272,22 @@ def fetch_gdelt_news():
             return empty_df
 
         data = response.json()
-        articles = data.get("articles", [])
-
         rows = []
 
-        for article in articles:
+        for article in data.get("articles", []):
             title = article.get("title", "")
             source_country = article.get("sourceCountry", "LatAm")
             article_url = article.get("url", "")
+
             score = news_risk_score(title)
 
             rows.append(
                 {
                     "Type": "News / Geopolitical",
                     "Location": source_country,
-                    "Headline": title,
                     "Risk Score": score,
                     "Severity": risk_label(score),
+                    "Headline": title,
                     "URL": article_url,
                 }
             )
@@ -289,7 +299,7 @@ def fetch_gdelt_news():
 
 
 # -----------------------------
-# LOAD DATA
+# APP BODY
 # -----------------------------
 try:
     eq_df = fetch_earthquakes()
@@ -298,83 +308,74 @@ try:
 
     map_df = pd.concat(
         [
-            eq_df[
-                [
-                    "Type",
-                    "Location",
-                    "Risk Score",
-                    "Severity",
-                    "Latitude",
-                    "Longitude",
-                ]
-            ],
-            weather_df[
-                [
-                    "Type",
-                    "Location",
-                    "Risk Score",
-                    "Severity",
-                    "Latitude",
-                    "Longitude",
-                ]
-            ],
+            eq_df[["Type", "Location", "Risk Score", "Severity", "Latitude", "Longitude", "Headline", "URL"]],
+            weather_df[["Type", "Location", "Risk Score", "Severity", "Latitude", "Longitude", "Headline", "URL"]],
         ],
         ignore_index=True,
     )
 
-    filtered_map_df = map_df[map_df["Risk Score"] >= min_risk]
-
-    combined_feed = pd.concat(
+    feed_df = pd.concat(
         [
-            map_df[
-                [
-                    "Type",
-                    "Location",
-                    "Risk Score",
-                    "Severity",
-                ]
-            ],
-            news_df[
-                [
-                    "Type",
-                    "Location",
-                    "Risk Score",
-                    "Severity",
-                    "Headline",
-                    "URL",
-                ]
-            ],
+            map_df[["Type", "Location", "Risk Score", "Severity", "Headline", "URL"]],
+            news_df[["Type", "Location", "Risk Score", "Severity", "Headline", "URL"]],
         ],
         ignore_index=True,
     )
 
-    combined_feed = combined_feed[combined_feed["Risk Score"] >= min_risk]
+    feed_df = feed_df[
+        (feed_df["Risk Score"] >= min_risk)
+        & (feed_df["Type"].isin(selected_categories))
+    ]
 
-    col1, col2, col3 = st.columns(3)
+    filtered_map_df = map_df[
+        (map_df["Risk Score"] >= min_risk)
+        & (map_df["Type"].isin(selected_categories))
+    ]
 
-    col1.metric("Live Risk Events", len(combined_feed))
+    # -----------------------------
+    # METRICS
+    # -----------------------------
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric("Live Risk Events", len(feed_df))
 
     col2.metric(
         "Highest Risk Score",
-        int(combined_feed["Risk Score"].max()) if not combined_feed.empty else 0,
+        int(feed_df["Risk Score"].max()) if not feed_df.empty else 0,
     )
 
     col3.metric(
+        "Critical / Elevated",
+        len(feed_df[feed_df["Severity"].isin(["Critical", "Elevated"])])
+        if not feed_df.empty else 0,
+    )
+
+    col4.metric(
         "Operational Status",
-        "Elevated" if not combined_feed.empty else "Normal",
+        "Elevated" if not feed_df.empty else "Normal",
     )
 
     st.divider()
 
+    # -----------------------------
+    # LIVE FEED
+    # -----------------------------
     st.subheader("Live Operational Risk Feed")
 
-    styled_feed = combined_feed.style.map(
-        color_severity,
-        subset=["Severity"],
-    )
+    display_feed = feed_df.copy()
 
-    st.dataframe(styled_feed, width="stretch")
+    if display_feed.empty:
+        st.success("No elevated operational risks detected under current filters.")
+    else:
+        styled_feed = display_feed.style.map(
+            color_severity,
+            subset=["Severity"],
+        )
+        st.dataframe(styled_feed, width="stretch", hide_index=True)
 
+    # -----------------------------
+    # MAP
+    # -----------------------------
     st.subheader("Operational Risk Map")
 
     risk_map = folium.Map(
@@ -390,12 +391,14 @@ try:
             color = "red"
         elif risk >= 5:
             color = "orange"
+        elif risk >= 3:
+            color = "yellow"
         else:
             color = "green"
 
         folium.CircleMarker(
             location=[row["Latitude"], row["Longitude"]],
-            radius=risk * 2,
+            radius=max(risk * 2, 6),
             popup=(
                 f"<b>Type:</b> {row['Type']}<br>"
                 f"<b>Location:</b> {row['Location']}<br>"
@@ -404,58 +407,64 @@ try:
             ),
             color=color,
             fill=True,
-            fill_opacity=0.7,
+            fill_opacity=0.75,
         ).add_to(risk_map)
 
     st_folium(risk_map, width=1400, height=600)
 
+    # -----------------------------
+    # WEATHER TABLE
+    # -----------------------------
     st.subheader("Regional Weather Monitoring")
 
-    styled_weather = weather_df[
-        [
-            "Location",
-            "Temperature",
-            "Wind Speed",
-            "Precipitation",
-            "Risk Score",
-            "Severity",
-        ]
-    ].style.map(
+    weather_display = weather_df[
+        ["Location", "Temperature", "Wind Speed", "Precipitation", "Risk Score", "Severity"]
+    ]
+
+    styled_weather = weather_display.style.map(
         color_severity,
         subset=["Severity"],
     )
 
-    st.dataframe(styled_weather, width="stretch")
+    st.dataframe(styled_weather, width="stretch", hide_index=True)
 
+    # -----------------------------
+    # NEWS TABLE
+    # -----------------------------
     st.subheader("Geopolitical & Supply Chain Signal Feed")
 
-    if not news_df.empty:
+    if news_df.empty:
+        st.warning("No geopolitical or supply chain news signals detected.")
+    else:
         styled_news = news_df.style.map(
             color_severity,
             subset=["Severity"],
         )
+        st.dataframe(styled_news, width="stretch", hide_index=True)
 
-        st.dataframe(styled_news, width="stretch")
-    else:
-        st.warning("No geopolitical or supply chain news signals detected.")
-
+    # -----------------------------
+    # OPERATIONAL SUMMARY
+    # -----------------------------
     st.subheader("AI Operational Summary")
 
-    if not combined_feed.empty:
-        top_event = combined_feed.sort_values("Risk Score", ascending=False).iloc[0]
+    if not feed_df.empty:
+        top_event = feed_df.sort_values("Risk Score", ascending=False).iloc[0]
 
         st.info(
             f"""
-            Elevated operational risk detected from {top_event['Type']}
-            near {top_event['Location']}.
+            Elevated operational risk detected from **{top_event['Type']}**
+            near **{top_event['Location']}**.
 
             AxiomSignal is monitoring seismic, weather, and geopolitical disruption
             indicators across major Latin American logistics corridors and
-            infrastructure hubs.
+            infrastructure hubs. Operators should review affected corridors, monitor
+            nearby assets, and prepare contingency plans where risk remains elevated.
             """
         )
     else:
-        st.success("No elevated operational risks detected.")
+        st.success(
+            "No elevated operational risks currently detected under the selected filters."
+        )
 
 except Exception as e:
     st.error(f"Unable to load live operational data: {e}")
