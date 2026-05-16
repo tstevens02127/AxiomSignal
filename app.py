@@ -6,9 +6,15 @@ import folium
 from datetime import datetime
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="AxiomSignal", layout="wide")
+col1, col2, col3 = st.columns([1,2,1])
 
-st.title("AxiomSignal")
+with col2:
+    st.image(
+        "assets/AxiomSignal transparent.png",
+        width=450
+    )
+
+st.set_page_config(page_title="AxiomSignal", layout="wide")
 
 st.caption(
     "Predictive Operational Intelligence for Latin American Logistics & Infrastructure"
@@ -20,6 +26,25 @@ st.subheader(
 
 st.caption(
     f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+)
+
+st.info(
+    """
+    AxiomSignal provides real-time operational risk intelligence
+    for Latin American logistics and infrastructure operators.
+    """
+)
+
+st.markdown(
+    """
+    ### Monitored Risk Categories
+
+    - Seismic Activity
+    - Severe Weather
+    - Infrastructure Disruption
+    - Geopolitical Events
+    - Supply Chain Volatility
+    """
 )
 
 st.sidebar.header("Filters")
