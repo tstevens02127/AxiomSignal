@@ -1,6 +1,10 @@
 import streamlit as st
 import pandas as pd
+import folium
+
 from datetime import datetime
+from streamlit_folium import st_folium
+
 
 st.set_page_config(
     page_title="AxiomSignal",
@@ -25,7 +29,9 @@ st.success("System operational.")
 data = pd.DataFrame({
     "Type": ["Earthquake", "Port Disruption", "Severe Weather"],
     "Location": ["Chile", "Panama Canal", "Brazil"],
-    "Risk Score": [8, 6, 7]
+    "Risk Score": [8, 6, 7],
+    "Latitude": [-33.45, 9.08, -23.55],
+    "Longitude": [-70.66, -79.68, -46.63]
 })
 
 st.sidebar.header("Filters")
@@ -57,3 +63,35 @@ st.divider()
 st.subheader("Live Operational Risk Feed")
 
 st.dataframe(filtered_data, use_container_width=True)
+
+st.subheader("Operational Risk Map")
+
+risk_map = folium.Map(
+    location=[-20, -70],
+    zoom_start=3,
+    tiles="CartoDB dark_matter"
+)
+
+for _, row in filtered_data.iterrows():
+
+    if row["Risk Score"] >= 8:
+        color = "red"
+    elif row["Risk Score"] >= 5:
+        color = "orange"
+    else:
+        color = "green"
+
+    folium.CircleMarker(
+        location=[row["Latitude"], row["Longitude"]],
+        radius=row["Risk Score"] * 2,
+        popup=(
+            f"{row['Type']}<br>"
+            f"{row['Location']}<br>"
+            f"Risk Score: {row['Risk Score']}"
+        ),
+        color=color,
+        fill=True,
+        fill_opacity=0.7,
+    ).add_to(risk_map)
+
+st_folium(risk_map, width=1400, height=500)
