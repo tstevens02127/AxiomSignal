@@ -163,6 +163,16 @@ with col3:
 
 st.divider()
 
+def risk_alert(score, message):
+    if score >= 8:
+        st.error(message)
+    elif score >= 5:
+        st.warning(message)
+    elif score >= 3:
+        st.info(message)
+    else:
+        st.success(message)
+
 st.subheader("AI Operational Intelligence Summary")
 
 highest_risk = filtered_data["Risk Score"].max()
@@ -182,19 +192,16 @@ else:
     Operational conditions currently stable across monitored regions.
     """
 
-st.info(summary)
+risk_alert(highest_risk, summary)
 
 top_event = filtered_data.sort_values(
     by="Risk Score",
     ascending=False
 ).iloc[0]
 
-st.warning(
-    f"""
-    Top Active Threat:
-    {top_event['Type']} detected near {top_event['Location']}
-    with risk score {top_event['Risk Score']}.
-    """
+risk_alert(
+    top_event["Risk Score"],
+    f"Top Active Threat: {top_event['Type']} detected near {top_event['Location']} with risk score {top_event['Risk Score']}."
 )
 
 st.subheader("Recommended Operational Actions")
