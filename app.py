@@ -236,6 +236,26 @@ if news_df.empty:
 else:
     st.dataframe(news_df, use_container_width=True)
 
+st.subheader("News-Based Operational Intelligence")
+
+if news_df.empty:
+    st.info(
+        "No current news-based operational risks detected across monitored logistics corridors."
+    )
+else:
+    top_headline = news_df.iloc[0]["Headline"]
+    source_country = news_df.iloc[0]["Source Country"]
+
+    st.warning(
+        f"""
+        Emerging news signal detected from {source_country}: {top_headline}
+
+        Recommended action: monitor for potential downstream effects on port operations,
+        cross-border logistics, shipping schedules, and regional infrastructure reliability.
+        """
+    )
+
+
 st.subheader("AI Operational Intelligence Summary")
 
 highest_risk = filtered_data["Risk Score"].max()
