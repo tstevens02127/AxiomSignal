@@ -163,6 +163,29 @@ with col3:
 
 st.divider()
 
+st.subheader("AI Operational Intelligence Summary")
+
+highest_risk = filtered_data["Risk Score"].max()
+
+if highest_risk >= 8:
+    summary = """
+    Critical operational risk detected across monitored corridors.
+    Immediate monitoring and contingency routing recommended.
+    """
+elif highest_risk >= 5:
+    summary = """
+    Elevated operational conditions detected.
+    Active monitoring recommended for supply chain disruptions.
+    """
+else:
+    summary = """
+    Operational conditions currently stable across monitored regions.
+    """
+
+st.info(summary)
+
+st.divider()
+
 st.subheader("Live Operational Risk Feed")
 
 display_columns = [
