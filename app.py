@@ -197,6 +197,25 @@ st.warning(
     """
 )
 
+st.subheader("Recommended Operational Actions")
+
+if top_event["Risk Score"] >= 8:
+    action = f"""
+    Immediate action recommended: monitor assets near {top_event['Location']},
+    review contingency routing, and alert operations teams responsible for exposed corridors.
+    """
+elif top_event["Risk Score"] >= 5:
+    action = f"""
+    Elevated monitoring recommended near {top_event['Location']}.
+    Review affected routes and maintain readiness for operational adjustments.
+    """
+else:
+    action = """
+    No immediate intervention required. Continue routine monitoring.
+    """
+
+st.success(action)
+
 st.divider()
 
 st.subheader("Live Operational Risk Feed")
