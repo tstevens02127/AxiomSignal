@@ -9,11 +9,15 @@ from streamlit_folium import st_folium
 # -----------------------------
 # PAGE CONFIG
 # -----------------------------
+
+st.set_page_config(
 st.set_page_config(
     page_title="AxiomSignal",
     page_icon="📡",
     layout="wide"
 )
+
+st.image("assets/logo.png", width=450)
 
 # -----------------------------
 # HEADER
