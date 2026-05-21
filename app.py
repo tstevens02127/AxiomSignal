@@ -192,7 +192,9 @@ def generate_ai_summary(top_risk):
         return response.choices[0].message.content
 
     except Exception:
-        return "AI summary temporarily unavailable. Continue monitoring live risk indicators and operational alerts."
+        st.error(response)
+        except Exception as e:
+            return str(e)
 
 
 st.sidebar.header("Filters")
