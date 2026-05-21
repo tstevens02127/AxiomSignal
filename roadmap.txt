@@ -7,3 +7,4 @@ user workflow
 MVP demo video
 Chile-focused signals
 operational scenarios
+Day 3 complete: live seismic + weather monitoring restored and deployed.
