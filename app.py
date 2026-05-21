@@ -6,6 +6,12 @@ import requests
 from datetime import datetime
 from streamlit_folium import st_folium
 from streamlit_autorefresh import st_autorefresh
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=st.secrets["XAI_API_KEY"],
+    base_url="https://api.x.ai/v1",
+)
 
 st.set_page_config(page_title="AxiomSignal", page_icon="📡", layout="wide")
 
@@ -156,6 +162,34 @@ earthquake_df = fetch_earthquakes()
 weather_df = fetch_weather()
 data = pd.concat([earthquake_df, weather_df], ignore_index=True)
 
+def generate_ai_summary(top_risk):
+
+    prompt = f"""
+    You are an AI operational intelligence analyst for Latin American logistics infrastructure.
+
+    Analyze this operational threat:
+
+    {top_risk}
+
+    Provide:
+    1. Operational risk assessment
+    2. Potential supply chain impact
+    3. Recommended action
+
+    Keep response concise and executive-level.
+    """
+
+    response = client.chat.completions.create(
+        model="grok-2-latest",
+        messages=[
+            {"role": "system", "content": "You are a logistics intelligence analyst."},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.3,
+    )
+
+    return response.choices[0].message.content
+
 st.sidebar.header("Filters")
 
 min_risk = st.sidebar.slider("Minimum Risk Score", 1, 10, 1)
@@ -228,7 +262,7 @@ def fetch_news():
     except Exception as e:
         st.error(f"News feed error: {e}")
         return pd.DataFrame(columns=["Headline", "Source Country", "URL"])
-        
+
 st.divider()
 
 def risk_alert(score, message):
@@ -279,15 +313,22 @@ else:
     )
 
 
+def risk_alert(score, message):
+    if score >= 8:
+        st.error(message)
+    elif score >= 5:
+        st.warning(message)
+    elif score >= 3:
+        st.info(message)
+    else:
+        st.success(message)
+
 st.subheader("AI Operational Intelligence Summary")
 
 highest_risk = filtered_data["Risk Score"].max()
 
 if highest_risk >= 8:
-    summary = """
-    Critical operational risk detected across monitored corridors.
-    Immediate monitoring and contingency routing recommended.
-    """
+    summary = generate_ai_summary(top_threat)
 elif highest_risk >= 5:
     summary = """
     Elevated operational conditions detected.
