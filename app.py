@@ -179,14 +179,20 @@ def generate_ai_summary(top_risk):
     Keep response concise and executive-level.
     """
 
+    try:
     response = client.chat.completions.create(
-        model="grok-2-latest",
+        model="grok-3-mini",
         messages=[
             {"role": "system", "content": "You are a logistics intelligence analyst."},
             {"role": "user", "content": prompt},
         ],
         temperature=0.3,
     )
+
+    return response.choices[0].message.content
+
+except Exception:
+    return "AI summary temporarily unavailable. Continue monitoring live risk indicators and operational alerts."
 
     return response.choices[0].message.content
 
