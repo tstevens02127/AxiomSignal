@@ -328,7 +328,7 @@ st.subheader("AI Operational Intelligence Summary")
 highest_risk = filtered_data["Risk Score"].max()
 
 if highest_risk >= 8:
-    summary = generate_ai_summary(top_threat)
+    summary = generate_ai_summary(top_event)
 elif highest_risk >= 5:
     summary = """
     Elevated operational conditions detected.
