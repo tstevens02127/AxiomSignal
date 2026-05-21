@@ -327,7 +327,13 @@ st.subheader("AI Operational Intelligence Summary")
 
 highest_risk = filtered_data["Risk Score"].max()
 
+top_event = filtered_data.sort_values(
+    by="Risk Score",
+    ascending=False
+).iloc[0]
+
 if highest_risk >= 8:
+    
     summary = generate_ai_summary(top_event)
 elif highest_risk >= 5:
     summary = """
@@ -340,11 +346,6 @@ else:
     """
 
 risk_alert(highest_risk, summary)
-
-top_event = filtered_data.sort_values(
-    by="Risk Score",
-    ascending=False
-).iloc[0]
 
 risk_alert(
     top_event["Risk Score"],
