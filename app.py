@@ -391,6 +391,37 @@ def generate_ai_adjusted_score(top_risk):
     except Exception:
         return int(top_risk["Risk Score"])
 
+def generate_threat_forecast(top_risk):
+    prompt = f"""
+    You are an operational forecasting AI for global logistics infrastructure.
+
+    Analyze this active threat:
+
+    {top_risk}
+
+    Forecast:
+    1. Likely escalation risk over next 24-72 hours
+    2. Expected operational evolution
+    3. Probability of supply chain disruption
+    4. Recommended monitoring priorities
+
+    Keep response concise and executive-level.
+    """
+
+    try:
+        response = client.chat.completions.create(
+            model="grok-3-mini",
+            messages=[
+                {"role": "system", "content": "You are an operational forecasting analyst."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.4,
+        )
+
+        return response.choices[0].message.content
+
+    except Exception:
+        return "Threat forecasting temporarily unavailable."
 
 # -----------------------------
 # APP HEADER
@@ -530,9 +561,13 @@ summary = generate_ai_summary(top_event)
 risk_alert(highest_risk, summary)
 
 route_analysis = generate_route_impact_analysis(top_event)
+forecast = generate_threat_forecast(top_event)
 
 st.subheader("AI Route & Corridor Impact Analysis")
 st.warning(route_analysis)
+
+st.subheader("AI Threat Forecast")
+st.info(forecast)
 
 risk_alert(
     top_event["Risk Score"],
