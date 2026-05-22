@@ -92,9 +92,16 @@ def calculate_port_exposure(ports_df, top_event):
         + abs(ports["Longitude"] - event_lon)
     )
 
+    base_risk = int(top_event["Risk Score"])
+
+    base_risk = int(top_event["Risk Score"])
+
     ports["Exposure Score"] = ports["Distance Score"].apply(
-        lambda x: max(1, min(10, int(10 - x / 10)))
-    )
+        lambda x: max(
+            1,
+            min(10, int(base_risk + 3 - (x / 15)))
+        )
+)
 
     ports["Exposure Level"] = ports["Exposure Score"].apply(risk_label)
 
