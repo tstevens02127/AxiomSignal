@@ -495,7 +495,7 @@ ai_score = generate_ai_adjusted_score(top_event)
 # METRICS
 # -----------------------------
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
     st.metric("Live Risk Events", len(filtered_data))
@@ -508,6 +508,18 @@ with col3:
 
 with col4:
     st.metric("AI Adjusted Score", ai_score)
+
+with col5:
+    ai_confidence = (
+        "High" if highest_score >= 7
+        else "Medium" if highest_score >= 4
+        else "Low"
+    )
+
+    st.metric(
+        "AI Confidence",
+        ai_confidence
+    )
 
 
 st.divider()
