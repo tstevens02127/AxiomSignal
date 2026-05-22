@@ -228,6 +228,44 @@ def fetch_news():
     except Exception:
         return pd.DataFrame(columns=columns)
 
+def get_major_ports():
+    return pd.DataFrame([
+        {
+            "Port": "Port of Santos",
+            "Country": "Brazil",
+            "Latitude": -23.95,
+            "Longitude": -46.33,
+            "Importance": "Critical"
+        },
+        {
+            "Port": "Port of Callao",
+            "Country": "Peru",
+            "Latitude": -12.05,
+            "Longitude": -77.15,
+            "Importance": "Critical"
+        },
+        {
+            "Port": "Port of Valparaiso",
+            "Country": "Chile",
+            "Latitude": -33.03,
+            "Longitude": -71.63,
+            "Importance": "High"
+        },
+        {
+            "Port": "Port of Cartagena",
+            "Country": "Colombia",
+            "Latitude": 10.40,
+            "Longitude": -75.53,
+            "Importance": "High"
+        },
+        {
+            "Port": "Port of Buenaventura",
+            "Country": "Colombia",
+            "Latitude": 3.88,
+            "Longitude": -77.03,
+            "Importance": "High"
+        }
+    ])
 
 # -----------------------------
 # AI FUNCTIONS
@@ -349,6 +387,7 @@ st.success("System operational.")
 earthquake_df = fetch_earthquakes()
 weather_df = fetch_weather()
 news_df = fetch_news()
+ports_df = get_major_ports()
 
 data = pd.concat([earthquake_df, weather_df], ignore_index=True)
 
@@ -601,6 +640,12 @@ for _, row in filtered_data.iterrows():
 
 st_folium(risk_map, width=1400, height=500)
 
+st.subheader("Strategic Maritime Infrastructure")
+
+st.dataframe(
+    ports_df,
+    use_container_width=True
+)
 
 # -----------------------------
 # WEATHER TABLE
