@@ -406,7 +406,6 @@ earthquake_df = fetch_earthquakes()
 weather_df = fetch_weather()
 news_df = fetch_news()
 ports_df = get_major_ports()
-port_exposure_df = calculate_port_exposure(ports_df, top_event)
 
 data = pd.concat([earthquake_df, weather_df], ignore_index=True)
 
@@ -445,6 +444,8 @@ top_event = filtered_data.sort_values(
     by="Risk Score",
     ascending=False
 ).iloc[0]
+
+port_exposure_df = calculate_port_exposure(ports_df, top_event)
 
 highest_score = int(filtered_data["Risk Score"].max())
 highest_risk = highest_score
