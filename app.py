@@ -544,7 +544,7 @@ else:
         )
         st.divider()
 
-
+st.divider()
 st.subheader("News-Based Operational Intelligence")
 
 if news_df.empty:
@@ -567,6 +567,7 @@ else:
 # AI INTELLIGENCE
 # -----------------------------
 
+st.divider()
 st.subheader("AI Operational Intelligence Summary")
 
 summary = generate_ai_summary(top_event)
@@ -575,9 +576,11 @@ risk_alert(highest_risk, summary)
 route_analysis = generate_route_impact_analysis(top_event)
 forecast = generate_threat_forecast(top_event)
 
+st.divider()
 st.subheader("AI Route & Corridor Impact Analysis")
 st.warning(route_analysis)
 
+st.divider()
 st.subheader("AI Threat Forecast")
 st.info(forecast)
 
@@ -586,7 +589,7 @@ risk_alert(
     f"Top Active Threat: {top_event['Type']} detected near {top_event['Location']} with risk score {top_event['Risk Score']}."
 )
 
-
+st.divider()
 st.subheader("Recommended Operational Actions")
 
 if top_event["Risk Score"] >= 8:
@@ -609,6 +612,7 @@ risk_alert(top_event["Risk Score"], action)
 # EXECUTIVE BRIEFING
 # -----------------------------
 
+st.divider()
 st.subheader("Executive Intelligence Briefing")
 
 briefing = f"""
@@ -680,6 +684,7 @@ st.dataframe(
 # MAP
 # -----------------------------
 
+st.divider()
 st.subheader("Operational Risk Map")
 
 risk_map = folium.Map(
@@ -714,6 +719,7 @@ for _, row in filtered_data.iterrows():
 
 st_folium(risk_map, width=1400, height=500)
 
+st.divider()
 st.subheader("Strategic Maritime Infrastructure")
 
 st.dataframe(
@@ -721,6 +727,7 @@ st.dataframe(
     use_container_width=True
 )
 
+st.divider()
 st.subheader("Port Exposure Scoring")
 
 st.dataframe(
@@ -732,6 +739,7 @@ st.dataframe(
 # WEATHER TABLE
 # -----------------------------
 
+st.divider()
 st.subheader("Regional Weather Monitoring")
 
 st.dataframe(
