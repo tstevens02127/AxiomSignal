@@ -309,7 +309,13 @@ def generate_ai_summary(top_risk):
     2. Potential supply chain impact
     3. Recommended action
 
-    Keep response concise and executive-level.
+    Format response into 3 short sections only.
+
+    Each section:
+    - maximum 2 bullets
+    - maximum 1 sentence per bullet
+
+    Keep response highly concise and executive-facing.
     """
 
     try:
@@ -343,7 +349,13 @@ def generate_route_impact_analysis(top_risk):
     4. Expected operational delays
     5. Recommended rerouting strategies
 
-    Keep response operational, concise, and executive-level.
+    Format response into 3 short sections only.
+
+    Each section:
+    - maximum 2 bullets
+    - maximum 1 sentence per bullet
+
+    Keep response highly concise and executive-facing.
     """
 
     try:
@@ -405,7 +417,13 @@ def generate_threat_forecast(top_risk):
     3. Probability of supply chain disruption
     4. Recommended monitoring priorities
 
-    Keep response concise and executive-level.
+    Format response into 3 short sections only.
+
+    Each section:
+    - maximum 2 bullets
+    - maximum 1 sentence per bullet
+
+    Keep response highly concise and executive-facing.
     """
 
     try:
@@ -451,6 +469,9 @@ data = pd.concat([earthquake_df, weather_df], ignore_index=True)
 # -----------------------------
 # SIDEBAR
 # -----------------------------
+
+st.sidebar.title("AxiomSignal")
+st.sidebar.caption("Operational Intelligence Platform")
 
 st.sidebar.header("Filters")
 
@@ -501,13 +522,13 @@ with col1:
     st.metric("Live Risk Events", len(filtered_data))
 
 with col2:
-    st.metric("Highest Risk Score", highest_score)
+    st.metric("Highest Active Threat", highest_score)
 
 with col3:
     st.metric("Operational Status", status)
 
 with col4:
-    st.metric("AI Adjusted Score", ai_score)
+    st.metric("AI Threat Severity", ai_score)
 
 with col5:
     ai_confidence = (
@@ -529,7 +550,7 @@ st.divider()
 # NEWS
 # -----------------------------
 
-st.subheader("Live News Intelligence Feed")
+st.subheader("🌎 Live News Intelligence Feed")
 
 if news_df.empty:
     st.warning("No live news intelligence signals detected.")
@@ -568,7 +589,7 @@ else:
 # -----------------------------
 
 st.divider()
-st.subheader("AI Operational Intelligence Summary")
+st.subheader("🤖 AI Operational Intelligence Summary")
 
 summary = generate_ai_summary(top_event)
 risk_alert(highest_risk, summary)
@@ -581,7 +602,7 @@ st.subheader("AI Route & Corridor Impact Analysis")
 st.warning(route_analysis)
 
 st.divider()
-st.subheader("AI Threat Forecast")
+st.subheader("📈 AI Threat Forecast")
 st.info(forecast)
 
 risk_alert(
@@ -685,7 +706,7 @@ st.dataframe(
 # -----------------------------
 
 st.divider()
-st.subheader("Operational Risk Map")
+st.subheader("🛰️ Operational Risk Map")
 
 risk_map = folium.Map(
     location=[-20, -70],
@@ -728,7 +749,7 @@ st.dataframe(
 )
 
 st.divider()
-st.subheader("Port Exposure Scoring")
+st.subheader("🚢 Port Exposure Scoring")
 
 st.dataframe(
     port_exposure_df,
@@ -747,4 +768,8 @@ st.dataframe(
         ["Location", "Temperature", "Wind Speed", "Precipitation", "Risk Score", "Severity"]
     ],
     use_container_width=True
+)
+
+st.caption(
+    "AxiomSignal — AI Operational Intelligence for Global Supply Chains"
 )
