@@ -23,7 +23,10 @@ with col1:
     st.button("Request Demo")
 
 with col2:
-    st.button("View Platform")
+    st.link_button(
+        "View Platform",
+        "https://axiomsignal.streamlit.app"
+    )
 
 st.divider()
 
@@ -56,7 +59,7 @@ st.divider()
 st.header("Platform Preview")
 
 st.image(
-    "https://placehold.co/1200x700/png",
+    "screenshots/dashboard-preview.png",
     use_container_width=True
 )
 
