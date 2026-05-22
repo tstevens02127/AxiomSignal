@@ -81,6 +81,24 @@ def weather_risk_score(wind_speed, precipitation):
 
     return min(score, 10)
 
+def calculate_port_exposure(ports_df, top_event):
+    ports = ports_df.copy()
+
+    event_lat = float(top_event["Latitude"])
+    event_lon = float(top_event["Longitude"])
+
+    ports["Distance Score"] = (
+        abs(ports["Latitude"] - event_lat)
+        + abs(ports["Longitude"] - event_lon)
+    )
+
+    ports["Exposure Score"] = ports["Distance Score"].apply(
+        lambda x: max(1, min(10, int(10 - x / 10)))
+    )
+
+    ports["Exposure Level"] = ports["Exposure Score"].apply(risk_label)
+
+    return ports.sort_values("Exposure Score", ascending=False)
 
 # -----------------------------
 # DATA FETCHING
@@ -388,6 +406,7 @@ earthquake_df = fetch_earthquakes()
 weather_df = fetch_weather()
 news_df = fetch_news()
 ports_df = get_major_ports()
+port_exposure_df = calculate_port_exposure(ports_df, top_event)
 
 data = pd.concat([earthquake_df, weather_df], ignore_index=True)
 
@@ -644,6 +663,13 @@ st.subheader("Strategic Maritime Infrastructure")
 
 st.dataframe(
     ports_df,
+    use_container_width=True
+)
+
+st.subheader("Port Exposure Scoring")
+
+st.dataframe(
+    port_exposure_df,
     use_container_width=True
 )
 
