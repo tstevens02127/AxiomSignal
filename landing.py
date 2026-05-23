@@ -108,13 +108,14 @@ st.header("Operational resilience starts with visibility.")
 
 st.write(
     """
-    AxiomSignal is currently in MVP development and is focused on helping
-    Latin American logistics and infrastructure operators improve disruption
-    visibility, operational readiness, and executive decision-making.
+    AxiomSignal provides AI-powered operational intelligence for resilient global supply chains.
     """
 )
 
-st.button("Contact AxiomSignal")
+st.link_button(
+    "Request Demo",
+    "mailto:arnoldmstevens@gmail.com?subject=AxiomSignal%20Demo%20Request"
+)
 
 st.caption(
     "AxiomSignal — AI Operational Intelligence for Global Supply Chains"
