@@ -12,15 +12,17 @@ st.markdown(
     """
     # AI Operational Intelligence for Global Supply Chains
 
-    Real-time threat monitoring, AI forecasting, maritime infrastructure awareness,
-    and executive intelligence for operational decision-makers.
+    AI-powered operational intelligence for supply chain resilience.
     """
 )
 
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    st.button("Request Demo")
+    st.link_button(
+        "Request Demo",
+        "mailto:arnoldmstevens@gmail.com"
+    )
 
 with col2:
     st.link_button(
@@ -63,8 +65,8 @@ st.image(
     use_container_width=True
 )
 
-st.caption(
-    "Live AI operational intelligence dashboard monitoring critical supply chain corridors."
+st.markdown(
+    "### Real-time AI operational intelligence dashboard"
 )
 
 st.divider()

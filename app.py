@@ -550,10 +550,10 @@ st.divider()
 # NEWS
 # -----------------------------
 
-st.subheader("🌎 Live News Intelligence Feed")
+st.subheader("🌎 External Intelligence Feed")
 
 if news_df.empty:
-    st.warning("No live news intelligence signals detected.")
+    st.warning("No external disruption signals currently detected from monitored sources.")
 else:
     for _, row in news_df.iterrows():
         st.markdown(
@@ -566,10 +566,10 @@ else:
         st.divider()
 
 st.divider()
-st.subheader("News-Based Operational Intelligence")
+st.subheader("External Signal Assessment")
 
 if news_df.empty:
-    st.info("No current news-based operational risks detected across monitored logistics corridors.")
+    st.info("No external escalation signals currently impacting monitored logistics corridors.")
 else:
     top_headline = news_df.iloc[0]["Headline"]
     source_country = news_df.iloc[0]["Source Country"]
