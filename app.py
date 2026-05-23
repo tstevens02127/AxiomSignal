@@ -699,6 +699,34 @@ st.dataframe(
     ],
     use_container_width=True
 )
+
+
+st.divider()
+
+# -----------------------------
+# DATA TABLE
+# -----------------------------
+
+st.subheader("Live Operational Risk Feed")
+
+display_columns = [
+    "Type",
+    "Location",
+    "Magnitude",
+    "Temperature",
+    "Wind Speed",
+    "Precipitation",
+    "Risk Score",
+    "Severity",
+    "Latitude",
+    "Longitude",
+]
+
+st.dataframe(
+    filtered_data[display_columns],
+    use_container_width=True
+)
+
 # -----------------------------
 # EXECUTIVE BRIEFING
 # -----------------------------
@@ -740,32 +768,6 @@ st.download_button(
     data=briefing,
     file_name="axiomsignal_executive_briefing.txt",
     mime="text/plain"
-)
-
-st.divider()
-
-# -----------------------------
-# DATA TABLE
-# -----------------------------
-
-st.subheader("Live Operational Risk Feed")
-
-display_columns = [
-    "Type",
-    "Location",
-    "Magnitude",
-    "Temperature",
-    "Wind Speed",
-    "Precipitation",
-    "Risk Score",
-    "Severity",
-    "Latitude",
-    "Longitude",
-]
-
-st.dataframe(
-    filtered_data[display_columns],
-    use_container_width=True
 )
 
 st.divider()
